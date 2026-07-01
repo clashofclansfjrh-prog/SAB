@@ -95,7 +95,7 @@
             font-size: 10px;
             color: var(--text-muted);
             text-align: right;
-            max-width: 300px;
+            max-width: 320px;
             line-height: 1.4;
             border-left: 2px solid var(--border);
             padding-left: 15px;
@@ -189,14 +189,24 @@
             background-color: #7dd3fc;
         }
 
+        .ctx-container-box {
+            position: relative;
+            background-color: rgba(255,255,255,0.01);
+            border-radius: 6px;
+            border-left: 3px solid var(--sab-cyan);
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+
         .ctx-info {
             font-size: 11px;
             color: var(--text-muted);
             line-height: 1.4;
-            background-color: rgba(255,255,255,0.01);
-            padding: 10px;
-            border-radius: 6px;
-            border-left: 3px solid var(--sab-cyan);
+            transition: opacity 0.3s ease-in-out;
+            width: 100%;
         }
 
         .content-panel {
@@ -335,24 +345,21 @@
 
         #frenado-alert {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(248, 113, 113, 0.95);
-            border: 1px solid #ffffff;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(239, 68, 68, 0.95);
+            border: 1px solid rgba(255,255,255,0.2);
             color: #ffffff;
-            padding: 8px 15px;
+            padding: 6px 12px;
             font-weight: bold;
-            font-size: 12px;
-            letter-spacing: 1px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
             display: none;
             pointer-events: none;
             z-index: 10;
-            border-radius: 4px;
-            box-shadow: 0 0 15px rgba(248, 113, 113, 0.5);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             text-align: center;
-            width: 80%;
-            box-sizing: border-box;
         }
 
         .playback-controls {
@@ -450,6 +457,14 @@
             .terrain-wrapper {
                 height: 130px;
             }
+
+            #frenado-alert {
+                top: auto;
+                bottom: 12px;
+                right: 12px;
+                font-size: 10px;
+                padding: 4px 8px;
+            }
         }
     </style>
 </head>
@@ -466,7 +481,7 @@
                 Desafíos de la Ingeniería 2026-1 | <b>Sección 6</b> | <b>Equipo 68</b>
             </div>
             <div class="header-team">
-                M. Espinoza, G. Pérez, J. Sáez, J. Mayen, F. Reyes, L. Vargas
+                M. Espinoza, J. Mayen, G. Pérez, J. Sáez, F. Reyes, L. Vargas
             </div>
         </div>
     </header>
@@ -506,8 +521,10 @@
             <button id="btn-simular">▶️ GENERAR SIMULACIÓN</button>
             
             <div class="sidebar-title" style="margin-top: 5px;">Contexto SAB</div>
-            <div class="ctx-info">
-                El 21% de los pacientes graves presentan deterioros cardiovasculares debido a vibraciones bruscas del traslado.
+            <div class="ctx-container-box">
+                <div class="ctx-info" id="rotativo-contexto">
+                    El 21% de los pacientes graves presentan deterioros cardiovasculares debido a vibraciones bruscas del traslado.
+                </div>
             </div>
         </div>
 
@@ -556,11 +573,18 @@
 
 <script>
     const DATOS_INTERESANTES = [
-        "💡 [DATO SAB] Según la norma ISO 2631-1, aceleraciones mayores a 2.5 m/s² se consideran 'extremadamente incómodas'.",
-        "⚠️ [RIESGO MÉDICO] La falta de amortiguación crítica en camillas convencionales induce microtraumas en la columna.",
-        "📐 [DISEÑO TÉCNICO] El sistema SAB utiliza amortiguadores hidráulicos viscosos lineales calibrados.",
-        "🚑 [LOGÍSTICA] Mantener la estabilidad bajo la meta de 3 cm permite realizar procedimientos de precisión.",
-        "🚨 [ALERTA] Los picos de impacto de las camillas comunes alcanzan 3 Gs de fuerza."
+        "El 21% de los pacientes graves presentan deterioros cardiovasculares debido a vibraciones bruscas del traslado.",
+        "Según la norma ISO 2631-1, aceleraciones mayores a 2.5 m/s² se consideran 'extremadamente incómodas' para el paciente.",
+        "La falta de amortiguación crítica en camillas convencionales induce microtraumas continuos en la columna vertebral.",
+        "El sistema SAB utiliza amortiguadores hidráulicos viscosos lineales calibrados para absorber impactos de alta frecuencia.",
+        "Mantener la estabilidad vertical bajo la meta de 3 cm permite realizar procedimientos médicos de precisión en ruta.",
+        "Los picos de impacto vertical de las camillas comunes en baches alcanzan hasta 3 Gs de fuerza instantánea.",
+        "El mecanismo de bloqueo inteligente rigidiza la superficie instantáneamente al detectar la presión de maniobras de RCP.",
+        "Las vibraciones del transporte sanitario influyen en el aumento de la presión intracraneal en pacientes con trauma.",
+        "SAB mitiga las frecuencias críticas de resonancia del vehículo autónomamente entre los 4 Hz y 12 Hz.",
+        "Un traslado estable reduce los errores de lectura en los monitores de signos vitales y electrocardiógrafos a bordo.",
+        "El diseño estructural combina aleaciones ligeras aeronáuticas para no exceder el peso límite operativo de la ambulancia.",
+        "La amortiguación adaptativa reduce en más de un 75% la aceleración cuadrática media transmitida al tórax del paciente."
     ];
 
     const fps = 30; 
@@ -580,6 +604,7 @@
     const factDisplay = document.getElementById('fact-display');
     const dinamicaTitle = document.getElementById('dinamica-title');
     const frenadoAlert = document.getElementById('frenado-alert');
+    const rotativoContexto = document.getElementById('rotativo-contexto');
 
     const btnBack = document.getElementById('btn-back');
     const btnPause = document.getElementById('btn-pause');
@@ -597,6 +622,17 @@
     let terreno_acumulado = [];
     let a_conv_acumulado = [];
     let a_sab_acumulado = [];
+
+    // Lógica para rotar los datos del cuadro de contexto automáticamente cada 5 segundos
+    let indexDatoActual = 0;
+    setInterval(() => {
+        indexDatoActual = (indexDatoActual + 1) % DATOS_INTERESANTES.length;
+        rotativoContexto.style.opacity = 0;
+        setTimeout(() => {
+            rotativoContexto.innerText = DATOS_INTERESANTES[indexDatoActual];
+            rotativoContexto.style.opacity = 1;
+        }, 300);
+    }, 5000);
 
     sliderVelocidad.addEventListener('input', () => {
         valorVelocidad.innerText = parseFloat(sliderVelocidad.value).toFixed(1) + 'x';
@@ -818,20 +854,21 @@
         chartDynamicInstance.update('none');
         chartTerrainInstance.update('none');
 
+        // Lógica de Alertas sin marcas de tiempo
         if (modoSeleccionadoGlobal === "Frenado Brusco") {
             let t_actual = frameIndex * dt_render;
             let t_ciclo = t_actual % 15.0;
 
             if (t_ciclo >= 3.5 && t_ciclo < 5.0) {
-                frenadoAlert.innerText = "⚠️ DETENCIÓN IMPREVISTA (3.5s)";
+                frenadoAlert.innerText = "⚠️ DETENCIÓN IMPREVISTA";
                 frenadoAlert.style.backgroundColor = "rgba(245, 158, 11, 0.95)";
                 frenadoAlert.style.display = 'block';
             } else if (t_ciclo >= 8.0 && t_ciclo < 10.0) {
-                frenadoAlert.innerText = "🚨 FRENADO DE EMERGENCY (8.0s)";
+                frenadoAlert.innerText = "🚨 FRENADO DE EMERGENCIA";
                 frenadoAlert.style.backgroundColor = "rgba(239, 68, 68, 0.95)";
                 frenadoAlert.style.display = 'block';
             } else if (t_ciclo >= 12.5 && t_ciclo < 14.0) {
-                frenadoAlert.innerText = "🛑 ESTABILIZACIÓN MENOR (12.5s)";
+                frenadoAlert.innerText = "🛑 ESTABILIZACIÓN MENOR";
                 frenadoAlert.style.backgroundColor = "rgba(220, 38, 38, 0.85)";
                 frenadoAlert.style.display = 'block';
             } else {
@@ -890,7 +927,7 @@
         chartsArea.style.display = 'none';
         loadingArea.style.display = 'flex';
 
-        factDisplay.innerText = DATOS_INTERESANTES[Math.floor(Math.random() * DATOS_INTERESANTES.length)];
+        factDisplay.innerText = "💡 [DATO DE INTERÉS] " + DATOS_INTERESANTES[Math.floor(Math.random() * DATOS_INTERESANTES.length)];
         modoSeleccionadoGlobal = selectorModo.value;
         const tipoGrafico = selectorTipoGrafico.value;
 
